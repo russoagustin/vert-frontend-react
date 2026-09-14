@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { Categoria } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { createCategoria, updateCategoria, deleteCategoria } from '../../api/categorias';
+import { formatErrorMessage } from '../../api/errors';
 import { ConfirmDialog } from './ConfirmDialog';
 
 export const AdminCategories: React.FC = () => {
@@ -28,7 +29,7 @@ export const AdminCategories: React.FC = () => {
       setSuccessMsg('Categoría creada exitosamente.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al crear categoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al crear categoría.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -49,7 +50,7 @@ export const AdminCategories: React.FC = () => {
       setSuccessMsg('Categoría actualizada.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al actualizar categoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al actualizar categoría.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -64,7 +65,7 @@ export const AdminCategories: React.FC = () => {
       setSuccessMsg('Categoría eliminada.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al eliminar categoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al eliminar categoría.'));
     } finally {
       setIsSubmitting(false);
     }

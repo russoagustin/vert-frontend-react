@@ -1,5 +1,10 @@
-import type { SubCategoria, SubCategoriaCreateRequest, SubCategoriaUpdateRequest } from '../types/api';
-import { apiFetch, setBackendOffline } from './client';
+import type {
+  SubCategoria,
+  SubCategoriaCreateRequest,
+  SubCategoriaUpdateRequest,
+  SubCategoriaOrdenItem,
+} from '../types/api';
+import { apiFetch, isBackendOffline } from './client';
 import {
   MOCK_SUBCATEGORIAS,
   mockCreateSubcategoria,
@@ -7,6 +12,10 @@ import {
   mockDeleteSubcategoria,
 } from './mockData';
 
+/**
+ * Listar subcategorías, opcionalmente filtrando por categoría padre.
+ * GET /api/subcategorias/categoria/{idCategoria} o GET /api/subcategorias
+ */
 export async function getSubcategorias(idCategoria?: number | null): Promise<SubCategoria[]> {
   try {
     const endpoint = idCategoria
@@ -14,25 +23,50 @@ export async function getSubcategorias(idCategoria?: number | null): Promise<Sub
       : '/api/subcategorias';
     return await apiFetch<SubCategoria[]>(endpoint);
   } catch (err) {
-    console.warn('Backend no disponible al obtener subcategorías. Utilizando datos DEMO.', err);
-    setBackendOffline(true);
-    if (idCategoria) {
-      return MOCK_SUBCATEGORIAS.filter((s) => s.idCategoria === idCategoria);
+    if (isBackendOffline()) {
+      console.warn('Backend no disponible al obtener subcategorías. Utilizando datos DEMO.');
+      if (idCategoria) {
+        return MOCK_SUBCATEGORIAS.filter((s) => s.idCategoria === idCategoria);
+      }
+      return MOCK_SUBCATEGORIAS;
     }
-    return MOCK_SUBCATEGORIAS;
-  }
-}
-
-export async function getSubcategoriaById(id: number): Promise<SubCategoria> {
-  try {
-    return await apiFetch<SubCategoria>(`/api/subcategorias/${id}`);
-  } catch (err) {
-    const encontrada = MOCK_SUBCATEGORIAS.find((s) => s.id === id);
-    if (encontrada) return encontrada;
     throw err;
   }
 }
 
+/**
+ * Buscar subcategoría por ID.
+ * GET /api/subcategorias/{id}
+ */
+export async function getSubcategoriaById(id: number): Promise<SubCategoria> {
+  try {
+    return await apiFetch<SubCategoria>(`/api/subcategorias/${id}`);
+  } catch (err) {
+    if (isBackendOffline()) {
+      const encontrada = MOCK_SUBCATEGORIAS.find((s) => s.id === id);
+      if (encontrada) return encontrada;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Buscar subcategoría por nombre exacto dentro de una categoría.
+ * GET /api/subcategorias/buscar?idCategoria={idCategoria}&nombre={nombre}
+ */
+export async function buscarSubcategoriaPorNombre(
+  idCategoria: number,
+  nombre: string
+): Promise<SubCategoria> {
+  return await apiFetch<SubCategoria>(
+    `/api/subcategorias/buscar?idCategoria=${idCategoria}&nombre=${encodeURIComponent(nombre)}`
+  );
+}
+
+/**
+ * Crear subcategoría.
+ * POST /api/subcategorias
+ */
 export async function createSubcategoria(data: SubCategoriaCreateRequest): Promise<void> {
   try {
     await apiFetch<void>('/api/subcategorias', {
@@ -40,30 +74,82 @@ export async function createSubcategoria(data: SubCategoriaCreateRequest): Promi
       body: JSON.stringify(data),
     });
   } catch (err) {
-    console.warn('Error en backend, aplicando creación de subcategoría en modo DEMO:', err);
-    mockCreateSubcategoria(data);
+    if (isBackendOffline()) {
+      console.warn('Backend desconectado, simulando creación de subcategoría.');
+      mockCreateSubcategoria(data);
+      return;
+    }
+    throw err;
   }
 }
 
-export async function updateSubcategoria(id: number, data: SubCategoriaUpdateRequest): Promise<void> {
+/**
+ * Modificar subcategoría existente.
+ * PUT /api/subcategorias/{id}
+ */
+export async function updateSubcategoria(
+  id: number,
+  data: SubCategoriaUpdateRequest
+): Promise<void> {
   try {
     await apiFetch<void>(`/api/subcategorias/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   } catch (err) {
-    console.warn('Error en backend, aplicando modificación de subcategoría en modo DEMO:', err);
-    mockUpdateSubcategoria(id, data);
+    if (isBackendOffline()) {
+      console.warn('Backend desconectado, simulando modificación de subcategoría.');
+      mockUpdateSubcategoria(id, data);
+      return;
+    }
+    throw err;
   }
 }
 
+/**
+ * Cambiar orden de subcategoría individual.
+ * PATCH /api/subcategorias/{id}/orden
+ */
+export async function cambiarOrdenSubcategoria(
+  id: number,
+  idCategoria: number,
+  orden: number
+): Promise<void> {
+  await apiFetch<void>(`/api/subcategorias/${id}/orden`, {
+    method: 'PATCH',
+    body: JSON.stringify({ idCategoria, orden }),
+  });
+}
+
+/**
+ * Reordenar subcategorías en lote de una categoría específica.
+ * PATCH /api/subcategorias/categoria/{idCategoria}/orden
+ */
+export async function reordenarSubcategoriasLote(
+  idCategoria: number,
+  items: SubCategoriaOrdenItem[]
+): Promise<void> {
+  await apiFetch<void>(`/api/subcategorias/categoria/${idCategoria}/orden`, {
+    method: 'PATCH',
+    body: JSON.stringify(items),
+  });
+}
+
+/**
+ * Eliminar subcategoría por ID.
+ * DELETE /api/subcategorias/{id}
+ */
 export async function deleteSubcategoria(id: number): Promise<void> {
   try {
     await apiFetch<void>(`/api/subcategorias/${id}`, {
       method: 'DELETE',
     });
   } catch (err) {
-    console.warn('Error en backend, aplicando eliminación de subcategoría en modo DEMO:', err);
-    mockDeleteSubcategoria(id);
+    if (isBackendOffline()) {
+      console.warn('Backend desconectado, simulando eliminación de subcategoría.');
+      mockDeleteSubcategoria(id);
+      return;
+    }
+    throw err;
   }
 }

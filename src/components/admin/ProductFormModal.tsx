@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { Producto, ProductoCreateRequest, ProductoUpdateRequest } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { createProducto, updateProducto } from '../../api/productos';
+import { formatErrorMessage } from '../../api/errors';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -133,8 +134,7 @@ const ProductFormContent: React.FC<ProductFormContentProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      const msg = err?.mensaje?.precioDescuentoValido || err?.mensaje || 'Error al guardar el producto.';
-      setFormError(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      setFormError(formatErrorMessage(err, 'Error al guardar el producto.'));
     } finally {
       setIsSubmitting(false);
     }

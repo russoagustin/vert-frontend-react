@@ -6,6 +6,7 @@ import {
   updateSubcategoria,
   deleteSubcategoria,
 } from '../../api/subcategorias';
+import { formatErrorMessage } from '../../api/errors';
 import { ConfirmDialog } from './ConfirmDialog';
 
 export const AdminSubcategories: React.FC = () => {
@@ -45,7 +46,7 @@ export const AdminSubcategories: React.FC = () => {
       setSuccessMsg('Subcategoría creada exitosamente.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al crear subcategoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al crear subcategoría.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +70,7 @@ export const AdminSubcategories: React.FC = () => {
       setSuccessMsg('Subcategoría actualizada.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al actualizar subcategoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al actualizar subcategoría.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -84,7 +85,7 @@ export const AdminSubcategories: React.FC = () => {
       setSuccessMsg('Subcategoría eliminada.');
       refreshCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.mensaje || 'Error al eliminar subcategoría.');
+      setErrorMsg(formatErrorMessage(err, 'Error al eliminar subcategoría.'));
     } finally {
       setIsSubmitting(false);
     }

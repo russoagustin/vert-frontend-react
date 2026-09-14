@@ -7,10 +7,12 @@ export const ProtectedRoute: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
+  // Si no está autenticado, redirige inmediatamente a /login preservando la ruta previa
   if (!isAuthenticated) {
-    // Redirige al login guardando la ubicación intentada para retornar tras autenticación
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
   return <Outlet />;
 };
+
+export default ProtectedRoute;

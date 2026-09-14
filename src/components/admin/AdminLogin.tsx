@@ -127,7 +127,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
         </form>
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Tip: En modo de prueba sin backend, puedes ingresar con usuario <code>admin</code> y clave <code>admin</code> o <code>admin123</code>.
+          Acceso protegido: Se requiere una cuenta con credenciales válidas en la base de datos de administración.
         </div>
       </div>
     </div>
