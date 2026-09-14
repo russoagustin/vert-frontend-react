@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vert Accesorios | Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050a0e; /* Fondo muy oscuro, casi negro con leve tono azul */
+            --primary-blue: #00e5ff; /* Cyan brillante */
+            --secondary-blue: #0077b6; /* Azul medio */
+            --dark-blue: #023e8a; /* Azul oscuro para fondos de tarjetas */
+            --text-muted: #4a6fa5;
+            --font-main: 'Share Tech Mono', monospace;
+            --border-glow: 0 0 5px var(--primary-blue), inset 0 0 5px var(--primary-blue);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary-blue);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Efecto de scanline para darle ese toque de monitor viejo */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--secondary-blue);
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.1);
+            position: sticky;
+            top: 0;
+            background-color: rgba(5, 10, 14, 0.9);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .menu-btn {
+            background: none;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            font-family: var(--font-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.2rem 0.6rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--border-glow);
+        }
+
+        .menu-btn:hover, .menu-btn:focus {
+            background-color: rgba(0, 229, 255, 0.1);
+            text-shadow: 0 0 5px var(--primary-blue);
+            outline: none;
+        }
+
+        .brand h1 {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--primary-blue);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Cursor parpadeante */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.5rem;
+            background-color: var(--primary-blue);
+            margin-left: 5px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .social-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: text-shadow 0.3s;
+        }
+
+        .social-link:hover {
+            text-shadow: 0 0 8px var(--primary-blue);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: rgba(5, 10, 14, 0.95);
+            border-right: 1px solid var(--secondary-blue);
+            box-shadow: 5px 0 15px rgba(0, 229, 255, 0.1);
+            transition: left 0.3s ease-in-out;
+            z-index: 200;
+            padding-top: 5rem; /* Espacio para el header */
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 2rem;
+            cursor: pointer;
+            font-family: var(--font-main);
+        }
+
+        .category-list {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .category-item {
+            margin-bottom: 1rem;
+        }
+
+        .category-title {
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .category-title:hover {
+            border-color: var(--secondary-blue);
+            background-color: rgba(0, 119, 182, 0.1);
+        }
+
+        .category-title::before {
+            content: ">";
+            margin-right: 10px;
+            color: var(--text-muted);
+        }
+
+        .subcategory-list {
+            list-style: none;
+            padding-left: 2rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-left: 1px dashed var(--secondary-blue);
+            margin-left: 0.8rem;
+        }
+
+        .subcategory-list.active {
+            max-height: 500px; /* Suficiente para expandir */
+            margin-top: 0.5rem;
+        }
+
+        .subcategory-item {
+            padding: 0.3rem 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        
+        .subcategory-item::before {
+            content: "- ";
+        }
+
+        .subcategory-item:hover, .subcategory-item.active {
+            color: var(--primary-blue);
+            text-shadow: 0 0 5px var(--primary-blue);
+        }
+
+        .view-all-btn {
+            display: block;
+            width: 100%;
+            background: none;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            font-family: var(--font-main);
+            padding: 0.5rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .view-all-btn:hover {
+            background-color: var(--primary-blue);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--primary-blue);
+        }
+
+        /* Overlay para cuando el menú está abierto */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 150;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px dashed var(--secondary-blue);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: "_";
+            animation: blink 1s step-end infinite;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: rgba(2, 62, 138, 0.1);
+            border: 1px solid var(--secondary-blue);
+            border-radius: 8px; /* Bordes ligeramente redondeados como en la imagen */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .product-image-container {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Cuadrado */
+            background-color: #000;
+            position: relative;
+            overflow: hidden;
+            padding: 10px; /* Margen interior para que la imagen no toque los bordes si es necesario */
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            /* Efecto CRT leve en la imagen */
+            filter: contrast(1.1) brightness(0.9) sepia(0.2) hue-rotate(180deg) saturate(1.5);
+            mix-blend-mode: screen;
+        }
+        
+        /* Simular textura de ruido de fondo de la imagen original */
+        .product-image-container::after {
+             content: "";
+             position: absolute;
+             top: 0; left: 0; right: 0; bottom: 0;
+             background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.15"/%3E%3C/svg%3E');
+             pointer-events: none;
+             border-radius: 4px;
+        }
+
+
+        .product-info {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            background-color: rgba(0,0,0,0.5); /* Fondo más oscuro para el texto */
+        }
+
+        .product-name {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #fff; /* Texto blanco para destacar */
+            text-transform: uppercase;
+            font-weight: normal;
+        }
+
+        .price-container {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .price-original {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .price-offer {
+            color: #00ff00; /* Verde para destacar la oferta tipo terminal */
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        /* SVG Icons */
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+            main {
+                padding: 1rem;
+            }
+            .sidebar {
+                width: 280px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .products-grid {
+                grid-template-columns: 1fr 1fr; /* Dos columnas en móviles muy pequeños */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="menu-btn" id="openMenuBtn" aria-label="Abrir menú">
+            [MENU]
+        </button>
+        <div class="brand">
+            <h1>Vert_Accesorios<span class="cursor"></span></h1>
+        </div>
+        <a href="#" class="social-link" aria-label="Instagram">
+            <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.181a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"/>
+            </svg>
+        </a>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <button class="close-btn" id="closeMenuBtn">&times;</button>
+        <ul class="category-list" id="categoryList">
+            <!-- Categorías renderizadas por JS -->
+        </ul>
+    </aside>
+
+    <main>
+        <h2 class="section-title" id="currentSectionTitle">Cargando Sistema</h2>
+        
+        <div class="products-grid" id="productsGrid">
+            <!-- Productos renderizados por JS -->
+            <div style="color: var(--text-muted);">Iniciando base de datos...</div>
+        </div>
+    </main>
+
+    <script>
+        // --- MOCK DATA (Simulando respuesta del Backend) ---
+        const catalogData = [
+            {
+                id: 'cat1',
+                name: 'Collares',
+                subcategories: [
+                    { id: 'sub1_1', name: 'Acero Quirúrgico' },
+                    { id: 'sub1_2', name: 'Plata 925' },
+                    { id: 'sub1_3', name: 'Chokers' }
+                ]
+            },
+            {
+                id: 'cat2',
+                name: 'Anillos',
+                subcategories: [
+                    { id: 'sub2_1', name: 'Regulables' },
+                    { id: 'sub2_2', name: 'Con Piedras' }
+                ]
+            },
+            {
+                id: 'cat3',
+                name: 'Aros',
+                subcategories: [
+                    { id: 'sub3_1', name: 'Argollas' },
+                    { id: 'sub3_2', name: 'Treparores' }
+                ]
+            }
+        ];
+
+        // Productos de ejemplo basados en tu imagen
+        const mockProducts = [
+            { id: 1, name: 'Collar Kitty', price: 7000, category: 'cat1', subcategory: 'sub1_1', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Collar+Kitty' },
+            { id: 2, name: 'Collar Estrellas', price: 6000, category: 'cat1', subcategory: 'sub1_1', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Estrellas' },
+            { id: 3, name: 'Set Collares Dije', price: 6000, offerPrice: 5000, category: 'cat1', subcategory: 'sub1_2', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Set+Dijes', suffix: ' c/u' },
+            { id: 4, name: 'Set Collares Sol/Estrella', price: 7000, category: 'cat1', subcategory: 'sub1_2', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Set+Sol', suffix: ' c/u' },
+            { id: 5, name: 'Cadena Eslabones', price: 5000, category: 'cat1', subcategory: 'sub1_3', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Eslabones' },
+            { id: 6, name: 'Anillo Fuego', price: 3500, offerPrice: 2800, category: 'cat2', subcategory: 'sub2_1', image: 'https://placehold.co/400x400/1a1a1a/ffffff?text=Anillo' },
+        ];
+
+        // --- DOM Elements ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const openMenuBtn = document.getElementById('openMenuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const categoryList = document.getElementById('categoryList');
+        const productsGrid = document.getElementById('productsGrid');
+        const currentSectionTitle = document.getElementById('currentSectionTitle');
+
+        // --- Funciones UI ---
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        openMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        function renderCategories() {
+            categoryList.innerHTML = '';
+            
+            catalogData.forEach(category => {
+                const li = document.createElement('li');
+                li.className = 'category-item';
+                
+                // Título de la categoría
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'category-title';
+                titleDiv.textContent = category.name;
+                
+                // Contenedor de subcategorías
+                const subList = document.createElement('ul');
+                subList.className = 'subcategory-list';
+                
+                // Lógica de acordeón
+                titleDiv.addEventListener('click', () => {
+                    const isActive = subList.classList.contains('active');
+                    // Cerrar todos los demás (opcional, lo dejo para que se puedan abrir varios si se desea, si no, agregar código aquí)
+                    subList.classList.toggle('active');
+                });
+
+                // Renderizar subcategorías
+                category.subcategories.forEach(sub => {
+                    const subLi = document.createElement('li');
+                    subLi.className = 'subcategory-item';
+                    subLi.textContent = sub.name;
+                    subLi.addEventListener('click', () => {
+                        loadProducts(category.id, sub.id, `${category.name} > ${sub.name}`);
+                        toggleMenu(); // Cierra el menú al seleccionar
+                    });
+                    subList.appendChild(subLi);
+                });
+
+                // Botón "Ver todo en {Categoria}"
+                const viewAllBtn = document.createElement('button');
+                viewAllBtn.className = 'view-all-btn';
+                viewAllBtn.textContent = `Ver todo en ${category.name}`;
+                viewAllBtn.addEventListener('click', () => {
+                    loadProducts(category.id, null, category.name);
+                    toggleMenu();
+                });
+                subList.appendChild(viewAllBtn);
+
+                li.appendChild(titleDiv);
+                li.appendChild(subList);
+                categoryList.appendChild(li);
+            });
+        }
+
+        function formatPrice(price) {
+            return '$' + price.toLocaleString('es-AR');
+        }
+
+        function renderProducts(products, title) {
+            currentSectionTitle.textContent = title;
+            productsGrid.innerHTML = '';
+
+            if (products.length === 0) {
+                productsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">> DATA_NOT_FOUND</div>';
+                return;
+            }
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                // Determinar precios
+                let priceHTML = '';
+                const suffix = product.suffix || '';
+                
+                if (product.offerPrice) {
+                    priceHTML = `
+                        <span class="price price-offer">${formatPrice(product.offerPrice)}${suffix}</span>
+                        <span class="price-original">${formatPrice(product.price)}</span>
+                    `;
+                } else {
+                    priceHTML = `<span class="price">${formatPrice(product.price)}${suffix}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="product-image-container">
+                        <img src="${product.image}" alt="${product.name}" class="product-image" loading="lazy">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <div class="price-container">
+                            ${priceHTML}
+                        </div>
+                    </div>
+                `;
+                productsGrid.appendChild(card);
+            });
+        }
+
+        function loadProducts(categoryId, subcategoryId = null, title = 'Catálogo') {
+            productsGrid.innerHTML = '<div style="color: var(--primary-blue);">> QUERYING_DB...</div>';
+            
+            // Simular un pequeño retraso de red
+            setTimeout(() => {
+                let filteredProducts = mockProducts;
+                
+                if (categoryId) {
+                    filteredProducts = filteredProducts.filter(p => p.category === categoryId);
+                }
+                if (subcategoryId) {
+                    filteredProducts = filteredProducts.filter(p => p.subcategory === subcategoryId);
+                }
+
+                renderProducts(filteredProducts, title);
+            }, 300); // 300ms delay
+        }
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            // Cargar todos los collares al inicio (como se ve en la imagen)
+            loadProducts('cat1', null, 'Collares'); 
+        });
+
+    </script>
+</body>
+</html>

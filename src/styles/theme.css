@@ -1,0 +1,122 @@
+:root {
+  --bg-color: #050a0e;
+  --bg-surface: rgba(2, 20, 36, 0.85);
+  --bg-card: rgba(2, 62, 138, 0.12);
+  --bg-card-hover: rgba(0, 229, 255, 0.08);
+  --primary-blue: #00e5ff;
+  --secondary-blue: #0077b6;
+  --dark-blue: #023e8a;
+  --text-primary: #ffffff;
+  --text-cyan: #00e5ff;
+  --text-muted: #4a6fa5;
+  --accent-green: #00ff66;
+  --accent-alert: #ff3366;
+  --font-main: 'Share Tech Mono', monospace;
+  --border-glow: 0 0 8px var(--primary-blue), inset 0 0 5px rgba(0, 229, 255, 0.3);
+  --text-glow: 0 0 10px rgba(0, 229, 255, 0.7);
+  --green-glow: 0 0 8px rgba(0, 255, 102, 0.7);
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: var(--bg-color);
+  color: var(--primary-blue);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Efecto de monitor CRT y scanline retro */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+    linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+  z-index: 999;
+  background-size: 100% 3px, 4px 100%;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-left: 1px solid var(--secondary-blue);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-blue);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-blue);
+  box-shadow: 0 0 8px var(--primary-blue);
+}
+
+/* Cursor parpadeante */
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1.2rem;
+  background-color: var(--primary-blue);
+  margin-left: 6px;
+  vertical-align: middle;
+  animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Animación de pulso leve */
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--primary-blue);
+  }
+  50% {
+    box-shadow: 0 0 15px var(--primary-blue), inset 0 0 8px rgba(0, 229, 255, 0.4);
+  }
+}
+
+/* Layout General */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+main.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  main.main-content {
+    padding: 1rem;
+  }
+}
