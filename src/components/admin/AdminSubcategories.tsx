@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { SubCategoria } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import {
@@ -23,6 +23,16 @@ export const AdminSubcategories: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    refreshCatalog();
+  }, [refreshCatalog]);
+
+  useEffect(() => {
+    if ((selectedCatId === '' || !categories.some((c) => c.id === selectedCatId)) && categories.length > 0) {
+      setSelectedCatId(categories[0].id);
+    }
+  }, [categories, selectedCatId]);
+
   // Lista plana de todas las subcategorías con nombre de su categoría padre
   const allSubcategories = categories.flatMap((cat) =>
     cat.subcategorias.map((sub) => ({
@@ -43,8 +53,8 @@ export const AdminSubcategories: React.FC = () => {
         nombre: nombreNueva.trim(),
       });
       setNombreNueva('');
+      await refreshCatalog();
       setSuccessMsg('Subcategoría creada exitosamente.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al crear subcategoría.'));
     } finally {
@@ -67,8 +77,8 @@ export const AdminSubcategories: React.FC = () => {
         nombre: editingNombre.trim(),
       });
       setEditingSubId(null);
+      await refreshCatalog();
       setSuccessMsg('Subcategoría actualizada.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al actualizar subcategoría.'));
     } finally {
@@ -82,8 +92,8 @@ export const AdminSubcategories: React.FC = () => {
     try {
       await deleteSubcategoria(subToDelete.id);
       setSubToDelete(null);
+      await refreshCatalog();
       setSuccessMsg('Subcategoría eliminada.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al eliminar subcategoría.'));
     } finally {

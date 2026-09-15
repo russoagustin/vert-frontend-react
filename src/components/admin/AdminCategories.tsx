@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Categoria } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { createCategoria, updateCategoria, deleteCategoria } from '../../api/categorias';
@@ -17,6 +17,10 @@ export const AdminCategories: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    refreshCatalog();
+  }, [refreshCatalog]);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nombreNueva.trim()) return;
@@ -26,8 +30,8 @@ export const AdminCategories: React.FC = () => {
     try {
       await createCategoria({ nombre: nombreNueva.trim() });
       setNombreNueva('');
+      await refreshCatalog();
       setSuccessMsg('Categoría creada exitosamente.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al crear categoría.'));
     } finally {
@@ -47,8 +51,8 @@ export const AdminCategories: React.FC = () => {
     try {
       await updateCategoria(id, { nombre: editingNombre.trim() });
       setEditingCatId(null);
+      await refreshCatalog();
       setSuccessMsg('Categoría actualizada.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al actualizar categoría.'));
     } finally {
@@ -62,8 +66,8 @@ export const AdminCategories: React.FC = () => {
     try {
       await deleteCategoria(catToDelete.id);
       setCatToDelete(null);
+      await refreshCatalog();
       setSuccessMsg('Categoría eliminada.');
-      refreshCatalog();
     } catch (err: any) {
       setErrorMsg(formatErrorMessage(err, 'Error al eliminar categoría.'));
     } finally {

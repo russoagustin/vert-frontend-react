@@ -27,7 +27,8 @@ export interface CatalogContextType {
   openProductModal: (product: Producto) => void;
   closeProductModal: () => void;
   resetFilters: () => void;
-  refreshCatalog: () => void;
+  refreshCatalog: () => Promise<void> | void;
+  refreshCategories: () => Promise<void> | void;
 }
 
 export const CatalogContext = createContext<CatalogContextType | undefined>(undefined);

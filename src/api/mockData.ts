@@ -216,8 +216,19 @@ export function getMockProductosPaginados(params: ProductFilterParams): PageResp
       let valB: any = b[campo as keyof Producto];
 
       if (campo === 'precio') {
-        valA = a.precioDescuento ?? a.precio;
-        valB = b.precioDescuento ?? b.precio;
+        const getPrecio = (p: Producto) => {
+          const precio = Number(p.precio) || 0;
+          const desc =
+            p.precioDescuento !== null && p.precioDescuento !== undefined
+              ? Number(p.precioDescuento)
+              : null;
+          if (desc !== null && !isNaN(desc) && desc < precio) {
+            return desc;
+          }
+          return precio;
+        };
+        valA = getPrecio(a);
+        valB = getPrecio(b);
       }
 
       if (valA < valB) return desc ? 1 : -1;

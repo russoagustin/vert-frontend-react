@@ -3,12 +3,8 @@ import { Link } from 'react-router-dom';
 import { useCatalog } from '../../hooks/useCatalog';
 import { ROUTES } from '../../router/routes';
 
-interface HeaderProps {
-  onNavigateToAdmin?: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onNavigateToAdmin }) => {
-  const { toggleMenu, resetFilters, isOfflineMode } = useCatalog();
+export const Header: React.FC = () => {
+  const { toggleMenu, resetFilters } = useCatalog();
 
   return (
     <header className="catalog-header">
@@ -21,7 +17,9 @@ export const Header: React.FC<HeaderProps> = ({ onNavigateToAdmin }) => {
         >
           [MENU]
         </button>
+      </div>
 
+      <div className="header-center">
         <Link
           to={ROUTES.HOME}
           className="brand-title"
@@ -36,47 +34,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigateToAdmin }) => {
       </div>
 
       <div className="header-right">
-        {onNavigateToAdmin ? (
-          <button
-            type="button"
-            className="terminal-btn"
-            style={{ fontSize: '0.9rem', padding: '0.25rem 0.6rem' }}
-            onClick={onNavigateToAdmin}
-            title="Ingresar al Panel de Gestión"
-          >
-            [⚙️ ADMIN]
-          </button>
-        ) : (
-          <Link
-            to={ROUTES.GESTION.ROOT}
-            className="terminal-btn"
-            style={{ fontSize: '0.9rem', padding: '0.25rem 0.6rem' }}
-            title="Ingresar al Panel de Gestión"
-          >
-            [⚙️ ADMIN]
-          </Link>
-        )}
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            fontSize: '0.8rem',
-            border: '1px solid var(--secondary-blue)',
-            padding: '0.2rem 0.6rem',
-            borderRadius: '4px',
-            backgroundColor: 'rgba(2, 62, 138, 0.2)',
-          }}
-        >
-          <span className={`status-dot ${isOfflineMode ? 'demo' : 'online'}`}></span>
-          <span style={{ color: isOfflineMode ? '#ffcc00' : 'var(--accent-green)' }}>
-            {isOfflineMode ? 'SYS: DEMO' : 'SYS: ONLINE'}
-          </span>
-        </div>
-
         <a
-          href="https://instagram.com"
+          href="https://www.instagram.com/vert.accesorios/"
           target="_blank"
           rel="noopener noreferrer"
           className="social-link"

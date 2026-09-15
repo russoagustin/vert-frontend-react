@@ -90,12 +90,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           )}
         </div>
-
-        {product.cantidad !== null && !isOutOfStock && (
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
-            &gt; DISP: {product.cantidad} UNID.
-          </div>
-        )}
       </div>
     </div>
   );

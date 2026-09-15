@@ -20,14 +20,7 @@ const ProductDetailContent: React.FC<ProductDetailContentProps> = ({ product, on
   };
 
   const hasDiscount = product.precioDescuento !== null && product.precioDescuento < product.precio;
-  const currentPrice = hasDiscount && product.precioDescuento ? product.precioDescuento : product.precio;
   const isOutOfStock = product.cantidad !== null && product.cantidad <= 0;
-
-  // Enlace para consultar por WhatsApp con mensaje pre-armado
-  const whatsappMessage = encodeURIComponent(
-    `Hola Vert Accesorios! Quisiera consultar sobre el producto: "${product.nombre}" (${formatPrice(currentPrice)}). ¿Tienen stock disponible?`
-  );
-  const whatsappUrl = `https://wa.me/?text=${whatsappMessage}`;
 
   return (
     <div
@@ -36,7 +29,7 @@ const ProductDetailContent: React.FC<ProductDetailContentProps> = ({ product, on
     >
       <div className="modal-header">
         <span className="modal-header-title">
-          &gt; DETALLE_PRODUCTO // ID_{product.id}
+          &gt; DETALLE_PRODUCTO
         </span>
         <button
           className="close-btn"
@@ -50,36 +43,36 @@ const ProductDetailContent: React.FC<ProductDetailContentProps> = ({ product, on
       <div className="modal-body">
         {/* Columna de Imagen */}
         <div className="modal-image-col">
-          {!imageError && product.imgUrl ? (
-            <img
-              src={product.imgUrl}
-              alt={product.nombre}
-              className="modal-image"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div
-              className="image-fallback"
-              style={{ height: '280px', borderRadius: '6px' }}
-            >
-              <svg
-                style={{ width: '48px', height: '48px', fill: 'currentColor' }}
-                viewBox="0 0 24 24"
-              >
-                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-              </svg>
-              <span>[IMAGEN_NO_DISPONIBLE]</span>
-            </div>
-          )}
-
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {hasDiscount && <TerminalBadge type="offer">PRECIO PROMOCIONAL</TerminalBadge>}
-            {isOutOfStock ? (
-              <TerminalBadge type="out-of-stock">SIN STOCK MOMENTÁNEO</TerminalBadge>
+          <div className="modal-image-container">
+            {!imageError && product.imgUrl ? (
+              <img
+                src={product.imgUrl}
+                alt={product.nombre}
+                className="modal-image"
+                onError={() => setImageError(true)}
+              />
             ) : (
-              <TerminalBadge type="stock">
-                STOCK DISPONIBLE: {product.cantidad ?? 'SÍ'}
-              </TerminalBadge>
+              <div
+                className="image-fallback"
+                style={{ borderRadius: '6px' }}
+              >
+                <svg
+                  style={{ width: '48px', height: '48px', fill: 'currentColor' }}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                </svg>
+                <span>[IMAGEN_NO_DISPONIBLE]</span>
+              </div>
+            )}
+
+            {(hasDiscount || isOutOfStock) && (
+              <div className="card-badges">
+                {hasDiscount && <TerminalBadge type="offer">PRECIO PROMOCIONAL</TerminalBadge>}
+                {isOutOfStock && (
+                  <TerminalBadge type="out-of-stock">SIN STOCK MOMENTÁNEO</TerminalBadge>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -128,36 +121,36 @@ const ProductDetailContent: React.FC<ProductDetailContentProps> = ({ product, on
             </div>
           </div>
 
-          <div className="modal-description">
-            <div
-              style={{
-                fontSize: '0.8rem',
-                color: 'var(--primary-blue)',
-                marginBottom: '0.4rem',
-                fontWeight: 'bold',
-              }}
-            >
-              &gt; ESPECIFICACIONES_Y_DETALLES:
+          {Boolean(product.descripcion?.trim()) && (
+            <div className="modal-description">
+              <div
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--primary-blue)',
+                  marginBottom: '0.4rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                &gt; ESPECIFICACIONES_Y_DETALLES:
+              </div>
+              <p>{product.descripcion}</p>
             </div>
-            <p>
-              {product.descripcion ||
-                'Accesorio de diseño exclusivo confeccionado con materiales seleccionados de alta durabilidad.'}
-            </p>
-          </div>
+          )}
 
           <a
-            href={whatsappUrl}
+            href="https://ig.me/m/vert.accesorios"
             target="_blank"
             rel="noopener noreferrer"
-            className="whatsapp-cta-btn"
+            className="instagram-cta-btn"
           >
             <svg
               style={{ width: '22px', height: '22px', fill: 'currentColor' }}
               viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/>
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.181a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" />
             </svg>
-            <span>Consultar / Pedir por WhatsApp</span>
+            <span>CONSULTAR / PEDIR POR INSTAGRAM</span>
           </a>
         </div>
       </div>

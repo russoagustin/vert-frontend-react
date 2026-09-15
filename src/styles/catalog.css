@@ -2,10 +2,10 @@
    HEADER & NAVBAR
    ============================================================ */
 .catalog-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.8rem 2rem;
   border-bottom: 1px solid var(--secondary-blue);
   box-shadow: 0 4px 20px rgba(0, 229, 255, 0.12);
   position: sticky;
@@ -13,24 +13,63 @@
   background-color: rgba(5, 10, 14, 0.94);
   z-index: 100;
   backdrop-filter: blur(8px);
+  gap: 0.8rem;
 }
 
-.header-left, .header-right {
+.header-left {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 1rem;
 }
 
-.brand-title {
-  font-size: 1.6rem;
-  letter-spacing: 2px;
-  text-shadow: var(--text-glow);
+.header-center {
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+}
+
+.brand-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary-blue);
   user-select: none;
   cursor: pointer;
   text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.brand-title:hover {
+  filter: brightness(1.2);
+}
+
+.brand-title h1 {
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: clamp(1px, 0.25vw, 2.5px);
+  text-shadow: var(--text-glow);
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.brand-title .cursor {
+  width: 7px;
+  height: 0.85em;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
 .terminal-btn {
@@ -645,21 +684,37 @@
 .modal-image-col {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+}
+
+.modal-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--secondary-blue);
+  background-color: #03070a;
 }
 
 .modal-image {
   width: 100%;
+  height: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--secondary-blue);
+  display: block;
+}
+
+.modal-image-container .image-fallback {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .modal-info-col {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
+  min-height: 0;
 }
 
 .modal-product-title {
@@ -684,13 +739,14 @@
   border-radius: 4px;
 }
 
+.instagram-cta-btn,
 .whatsapp-cta-btn {
-  background: rgba(0, 255, 102, 0.15);
-  border: 1px solid var(--accent-green);
-  color: var(--accent-green);
+  background: rgba(245, 96, 64, 0.15);
+  border: 1px solid #f56040;
+  color: #ff6849;
   font-family: var(--font-main);
-  font-size: 1.1rem;
-  padding: 0.8rem 1.2rem;
+  font-size: 1.05rem;
+  padding: 0.85rem 1.2rem;
   cursor: pointer;
   text-transform: uppercase;
   display: flex;
@@ -699,15 +755,20 @@
   gap: 0.6rem;
   text-decoration: none;
   font-weight: bold;
+  letter-spacing: 0.5px;
   transition: var(--transition-smooth);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+  box-shadow: 0 0 12px rgba(245, 96, 64, 0.35);
   margin-top: auto;
+  border-radius: 4px;
 }
 
+.instagram-cta-btn:hover,
 .whatsapp-cta-btn:hover {
-  background: var(--accent-green);
-  color: #050a0e;
-  box-shadow: 0 0 20px var(--accent-green);
+  background: linear-gradient(135deg, #e1306c 0%, #fd1d1d 50%, #f77737 100%);
+  color: #ffffff;
+  border-color: #ff7755;
+  box-shadow: 0 0 20px rgba(245, 96, 64, 0.65);
+  transform: translateY(-1px);
 }
 
 /* ============================================================
@@ -754,10 +815,12 @@
    ============================================================ */
 @media (max-width: 768px) {
   .catalog-header {
-    padding: 0.8rem 1rem;
+    padding: 0.65rem 1rem;
+    gap: 0.4rem;
   }
-  .brand-title {
-    font-size: 1.3rem;
+  .brand-title h1 {
+    font-size: clamp(0.85rem, 3.2vw, 1.15rem);
+    letter-spacing: 1px;
   }
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -774,7 +837,20 @@
   }
 }
 
+@media (max-width: 540px) {
+  .catalog-header {
+    padding: 0.5rem 0.8rem;
+  }
+  .terminal-btn {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
 @media (max-width: 420px) {
+  .brand-title h1 {
+    font-size: clamp(0.78rem, 3.6vw, 0.95rem);
+  }
   .products-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;

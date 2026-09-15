@@ -144,6 +144,14 @@ export const CatalogProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setCurrentSectionTitle('Catálogo Completo');
   }, []);
 
+  const refreshCatalog = useCallback(async () => {
+    await Promise.all([loadCategories(), loadProducts()]);
+  }, [loadCategories, loadProducts]);
+
+  const refreshCategories = useCallback(async () => {
+    await loadCategories();
+  }, [loadCategories]);
+
   return (
     <CatalogContext.Provider
       value={{
@@ -170,7 +178,8 @@ export const CatalogProvider: React.FC<{ children: React.ReactNode }> = ({ child
         openProductModal,
         closeProductModal,
         resetFilters,
-        refreshCatalog: loadProducts,
+        refreshCatalog,
+        refreshCategories,
       }}
     >
       {children}

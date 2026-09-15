@@ -3,54 +3,14 @@ import { useCatalog } from '../../hooks/useCatalog';
 
 export const FilterBar: React.FC = () => {
   const {
-    searchQuery,
-    setSearchQuery,
     sortOption,
     setSortOption,
-    resetFilters,
-    selectedCategoryId,
-    selectedSubcategoryId,
-    pageData,
   } = useCatalog();
 
-  const isFiltered = Boolean(
-    selectedCategoryId !== null ||
-    selectedSubcategoryId !== null ||
-    searchQuery.trim() !== '' ||
-    sortOption !== 'id,asc'
-  );
+  const isSortChanged = sortOption !== 'id,asc';
 
   return (
     <div className="filter-bar">
-      <div className="search-input-group">
-        <span className="search-prompt">&gt; BUSCAR:</span>
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Nombre o descripción..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          aria-label="Buscar productos por nombre"
-        />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery('')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-main)',
-              fontSize: '1rem',
-              padding: '0 0.3rem',
-            }}
-            title="Borrar búsqueda"
-          >
-            &times;
-          </button>
-        )}
-      </div>
-
       <div className="sort-select-group">
         <label htmlFor="sortSelect" className="sort-label">
           [ORDEN]:
@@ -68,20 +28,14 @@ export const FilterBar: React.FC = () => {
         </select>
       </div>
 
-      {isFiltered && (
+      {isSortChanged && (
         <button
           className="clear-filter-btn"
-          onClick={resetFilters}
-          title="Limpiar todos los filtros"
+          onClick={() => setSortOption('id,asc')}
+          title="Restablecer orden por defecto"
         >
           [LIMPIAR_FILTROS &times;]
         </button>
-      )}
-
-      {pageData && (
-        <div style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          TOTAL: {pageData.totalElements} ÍTEMS
-        </div>
       )}
     </div>
   );

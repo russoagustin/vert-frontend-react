@@ -15,6 +15,22 @@ import {
 } from './mockData';
 
 /**
+ * Calcula el precio final efectivo de venta (considerando precio con descuento si es menor al precio regular).
+ */
+export function getPrecioEfectivo(p: Producto): number {
+  const precio = Number(p.precio) || 0;
+  const precioDescuento =
+    p.precioDescuento !== null && p.precioDescuento !== undefined
+      ? Number(p.precioDescuento)
+      : null;
+
+  if (precioDescuento !== null && !isNaN(precioDescuento) && precioDescuento < precio) {
+    return precioDescuento;
+  }
+  return precio;
+}
+
+/**
  * Listar productos paginados con filtros opcionales (Spring Data Pageable).
  * GET /api/productos?idCategoria=...&idSubCategoria=...&page=...&size=...&sort=...
  */
@@ -31,23 +47,39 @@ export async function getProductos(params: ProductFilterParams = {}): Promise<Pa
 
   try {
     const data = await apiFetch<PageResponse<Producto>>(endpoint);
+    let content = data.content ? [...data.content] : [];
 
     // Filtrado de búsqueda textual local en la página activa si se envió search
-    if (params.search && params.search.trim() !== '' && data.content) {
+    if (params.search && params.search.trim() !== '' && content.length > 0) {
       const searchLower = params.search.toLowerCase().trim();
-      const filtered = data.content.filter(
+      content = content.filter(
         (p) =>
           p.nombre.toLowerCase().includes(searchLower) ||
           (p.descripcion && p.descripcion.toLowerCase().includes(searchLower))
       );
-      return {
-        ...data,
-        content: filtered,
-        numberOfElements: filtered.length,
-      };
     }
 
-    return data;
+    // Ordenamiento por precio efectivo considerando posibles ofertas/descuentos
+    if (params.sort && content.length > 1) {
+      const [campo, direccion] = params.sort.split(',');
+      if (campo === 'precio') {
+        const desc = direccion === 'desc';
+        content.sort((a, b) => {
+          const priceA = getPrecioEfectivo(a);
+          const priceB = getPrecioEfectivo(b);
+          if (priceA !== priceB) {
+            return desc ? priceB - priceA : priceA - priceB;
+          }
+          return desc ? b.id - a.id : a.id - b.id;
+        });
+      }
+    }
+
+    return {
+      ...data,
+      content,
+      numberOfElements: content.length,
+    };
   } catch (err) {
     if (isBackendOffline()) {
       console.warn('Backend no disponible al obtener productos. Utilizando datos DEMO.');
