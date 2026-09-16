@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const rawTarget = env.VITE_API_PROXY_TARGET || env.VITE_API_BASE_URL;
+  const rawTarget = env.API_BASE_URL || env.VITE_API_PROXY_TARGET || env.VITE_API_BASE_URL;
   const proxyTarget =
     rawTarget && (rawTarget.startsWith('http://') || rawTarget.startsWith('https://'))
       ? rawTarget
@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    envPrefix: ['VITE_', 'API_'],
     server: {
       port: 5173,
       proxy: {
