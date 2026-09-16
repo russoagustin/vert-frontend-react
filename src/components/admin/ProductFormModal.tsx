@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Producto, ProductoCreateRequest, ProductoUpdateRequest } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { createProducto, updateProducto } from '../../api/productos';
@@ -142,7 +142,7 @@ const ProductFormContent: React.FC<ProductFormContentProps> = ({
 
   return (
     <div
-      className="modal-window"
+      className="modal-window product-form-modal"
       style={{ maxWidth: '680px' }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -324,10 +324,20 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
+    <div className="modal-backdrop product-form-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <ProductFormContent
         key={productToEdit?.id ?? 'new'}
         productToEdit={productToEdit}

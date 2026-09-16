@@ -7,7 +7,7 @@ export const FilterBar: React.FC = () => {
     setSortOption,
   } = useCatalog();
 
-  const isSortChanged = sortOption !== 'id,asc';
+  const isSortChanged = sortOption !== 'id,desc';
 
   return (
     <div className="filter-bar">
@@ -21,7 +21,7 @@ export const FilterBar: React.FC = () => {
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
         >
-          <option value="id,asc">Por defecto (Novedades)</option>
+          <option value="id,desc">Por defecto (Novedades)</option>
           <option value="precio,asc">Precio: Menor a Mayor</option>
           <option value="precio,desc">Precio: Mayor a Menor</option>
           <option value="nombre,asc">Nombre: A - Z</option>
@@ -31,7 +31,7 @@ export const FilterBar: React.FC = () => {
       {isSortChanged && (
         <button
           className="clear-filter-btn"
-          onClick={() => setSortOption('id,asc')}
+          onClick={() => setSortOption('id,desc')}
           title="Restablecer orden por defecto"
         >
           [LIMPIAR_FILTROS &times;]

@@ -13,7 +13,7 @@ export const CatalogProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
   const [currentSectionTitle, setCurrentSectionTitle] = useState<string>('Catálogo Completo');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortOption, setSortOption] = useState<string>('id,asc');
+  const [sortOption, setSortOption] = useState<string>('id,desc');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize] = useState<number>(12);
   const [pageData, setPageData] = useState<PageResponse<Producto> | null>(null);
@@ -139,7 +139,7 @@ export const CatalogProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSelectedCategoryId(null);
     setSelectedSubcategoryId(null);
     setSearchQuery('');
-    setSortOption('id,asc');
+    setSortOption('id,desc');
     setCurrentPage(0);
     setCurrentSectionTitle('Catálogo Completo');
   }, []);

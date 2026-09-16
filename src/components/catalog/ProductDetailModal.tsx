@@ -24,7 +24,7 @@ const ProductDetailContent: React.FC<ProductDetailContentProps> = ({ product, on
 
   return (
     <div
-      className="modal-window"
+      className="modal-window product-detail-modal"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="modal-header">
@@ -171,11 +171,21 @@ export const ProductDetailModal: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedProductForModal, closeProductModal]);
 
+  useEffect(() => {
+    if (selectedProductForModal) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [selectedProductForModal]);
+
   if (!selectedProductForModal) return null;
 
   return (
     <div
-      className="modal-backdrop"
+      className="modal-backdrop product-detail-backdrop"
       onClick={closeProductModal}
       role="dialog"
       aria-modal="true"

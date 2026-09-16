@@ -41,7 +41,8 @@ export async function getProductos(params: ProductFilterParams = {}): Promise<Pa
   if (params.idSubCategoria) query.append('idSubCategoria', params.idSubCategoria.toString());
   if (params.page !== undefined) query.append('page', params.page.toString());
   if (params.size !== undefined) query.append('size', params.size.toString());
-  if (params.sort) query.append('sort', params.sort);
+  const sortParam = params.sort ?? 'id,desc';
+  if (sortParam) query.append('sort', sortParam);
 
   const endpoint = `/api/productos${query.toString() ? `?${query.toString()}` : ''}`;
 
@@ -83,7 +84,7 @@ export async function getProductos(params: ProductFilterParams = {}): Promise<Pa
   } catch (err) {
     if (isBackendOffline()) {
       console.warn('Backend no disponible al obtener productos. Utilizando datos DEMO.');
-      return getMockProductosPaginados(params);
+      return getMockProductosPaginados({ ...params, sort: sortParam });
     }
     throw err;
   }

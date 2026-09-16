@@ -207,8 +207,9 @@ export function getMockProductosPaginados(params: ProductFilterParams): PageResp
     );
   }
 
-  if (params.sort) {
-    const [campo, direccion] = params.sort.split(',');
+  const sortParam = params.sort ?? 'id,desc';
+  if (sortParam) {
+    const [campo, direccion] = sortParam.split(',');
     const desc = direccion === 'desc';
 
     filtrados.sort((a, b) => {

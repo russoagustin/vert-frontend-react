@@ -786,7 +786,7 @@ El módulo de productos incluye paginación con Spring Data y almacenamiento de 
   - `idSubCategoria` *(number, opcional)*: Filtra por subcategoría (usar junto a `idCategoria`).
   - `page` *(number, opcional, default: `0`)*: Índice de página (comienza en 0).
   - `size` *(number, opcional, default: `14`)*: Cantidad de productos por página.
-  - `sort` *(string, opcional, default: `id,asc`)*: Ordenamiento (ej: `precio,desc`, `nombre,asc`).
+  - `sort` *(string, opcional, default: `id,desc`)*: Ordenamiento (ej: `precio,desc`, `nombre,asc`).
 
 #### Respuestas:
 - **`200 OK`**: Retorna el objeto `PageResponse<Producto>` (ver estructura en Sección 4).
