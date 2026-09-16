@@ -1,7 +1,9 @@
 import type { ApiErrorResponse } from '../types/api';
 
-// En desarrollo se utiliza el proxy de Vite (cadena vacía '') para redirigir a http://localhost:8080 sin problemas de CORS ni cookies
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+// URL base de la API REST obtenida desde la variable de entorno de Vite (VITE_API_BASE_URL / VITE_API_URL).
+// Se eliminan diagonales finales para garantizar rutas limpias al concatenar endpoints.
+const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? '').trim();
+export const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
 let backendOffline = false;
 
