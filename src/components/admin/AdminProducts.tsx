@@ -1,20 +1,102 @@
-import React, { useState } from 'react';
-import type { Producto } from '../../types/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import type { Producto, PageResponse } from '../../types/api';
 import { useCatalog } from '../../hooks/useCatalog';
-import { deleteProducto } from '../../api/productos';
+import { deleteProducto, getProductos } from '../../api/productos';
+import { useDebounce } from '../../hooks/useDebounce';
 import { ProductFormModal } from './ProductFormModal';
 import { ConfirmDialog } from './ConfirmDialog';
+import { AdminPagination } from './AdminPagination';
 
 export const AdminProducts: React.FC = () => {
-  const { pageData, refreshCatalog, categories, isLoadingProducts } = useCatalog();
+  const { refreshCatalog, categories } = useCatalog();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Estados locales de filtrado, búsqueda y paginación
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(14);
+
+  // Estados de datos y carga
+  const [pageData, setPageData] = useState<PageResponse<Producto> | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Estados de modales y acciones
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [productToEdit, setProductToEdit] = useState<Producto | null>(null);
-
   const [productToDelete, setProductToDelete] = useState<Producto | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
+  // Debounce para la búsqueda en la API (350ms)
+  const debouncedSearch = useDebounce(searchQuery, 350);
+
+  // Carga de productos desde la API
+  const fetchAdminProducts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await getProductos({
+        idCategoria: selectedCategoryId,
+        idSubCategoria: selectedSubcategoryId,
+        page: currentPage,
+        size: pageSize,
+        search: debouncedSearch,
+        sort: 'id,desc',
+      });
+      setPageData(response);
+    } catch (err) {
+      console.error('Error al cargar productos en panel admin:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedCategoryId, selectedSubcategoryId, currentPage, pageSize, debouncedSearch]);
+
+  // Disparar carga cuando cambian los parámetros de consulta
+  useEffect(() => {
+    fetchAdminProducts();
+  }, [fetchAdminProducts]);
+
+  // Manejadores de filtros
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(0);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setCurrentPage(0);
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value ? Number(e.target.value) : null;
+    setSelectedCategoryId(val);
+    setSelectedSubcategoryId(null); // Resetear subcategoría al cambiar categoría
+    setCurrentPage(0);
+  };
+
+  const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value ? Number(e.target.value) : null;
+    setSelectedSubcategoryId(val);
+    setCurrentPage(0);
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategoryId(null);
+    setSelectedSubcategoryId(null);
+    setCurrentPage(0);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(0);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  // Modales
   const handleEdit = (product: Producto) => {
     setProductToEdit(product);
     setIsModalOpen(true);
@@ -30,9 +112,16 @@ export const AdminProducts: React.FC = () => {
     setIsDeleting(true);
     try {
       await deleteProducto(productToDelete.id);
-      refreshCatalog();
+      refreshCatalog(); // Refrescar catálogo público
       setAlertMessage(`Producto "${productToDelete.nombre}" eliminado exitosamente.`);
       setProductToDelete(null);
+
+      // Si se elimina el último elemento en una página > 0, retroceder de página
+      if (pageData && pageData.content.length === 1 && currentPage > 0) {
+        setCurrentPage((prev) => prev - 1);
+      } else {
+        fetchAdminProducts();
+      }
     } catch (err: any) {
       alert('Error al eliminar producto: ' + (err?.mensaje || 'Error desconocido'));
     } finally {
@@ -53,14 +142,20 @@ export const AdminProducts: React.FC = () => {
     return cat?.subcategorias.find((s) => s.id === subId)?.nombre || `ID ${subId}`;
   };
 
+  // Subcategorías de la categoría seleccionada actualmente
+  const activeCategory = categories.find((c) => c.id === selectedCategoryId);
+  const availableSubcategories = activeCategory?.subcategorias || [];
+  const hasActiveFilters = Boolean(searchQuery.trim() || selectedCategoryId !== null || selectedSubcategoryId !== null);
+
   return (
     <div>
+      {/* Encabezado de la vista con contador y botón de alta */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '1.5rem',
+          marginBottom: '1.2rem',
           flexWrap: 'wrap',
           gap: '1rem',
         }}
@@ -82,6 +177,90 @@ export const AdminProducts: React.FC = () => {
         </button>
       </div>
 
+      {/* Barra de herramientas: Búsqueda por nombre y Filtro por categoría */}
+      <div className="admin-toolbar">
+        <div className="admin-toolbar-row">
+          {/* Barra de Búsqueda por Nombre */}
+          <div className="admin-search-wrapper">
+            <span className="admin-search-icon">&gt;</span>
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder="Buscar producto por nombre..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              aria-label="Buscar producto por nombre"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="admin-clear-btn"
+                onClick={handleClearSearch}
+                title="Limpiar búsqueda"
+                aria-label="Limpiar búsqueda"
+              >
+                &times;
+              </button>
+            )}
+          </div>
+
+          {/* Filtro por Categoría */}
+          <div className="admin-filter-group">
+            <label htmlFor="adminCatFilter" className="admin-filter-label">
+              CATEGORÍA:
+            </label>
+            <select
+              id="adminCatFilter"
+              className="admin-filter-select"
+              value={selectedCategoryId ?? ''}
+              onChange={handleCategoryChange}
+            >
+              <option value="">[TODAS LAS CATEGORÍAS]</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Filtro por Subcategoría (condicional a la categoría seleccionada) */}
+          {selectedCategoryId !== null && availableSubcategories.length > 0 && (
+            <div className="admin-filter-group">
+              <label htmlFor="adminSubcatFilter" className="admin-filter-label">
+                SUBCATEGORÍA:
+              </label>
+              <select
+                id="adminSubcatFilter"
+                className="admin-filter-select"
+                value={selectedSubcategoryId ?? ''}
+                onChange={handleSubcategoryChange}
+              >
+                <option value="">[TODAS LAS SUBCATEGORÍAS]</option>
+                {availableSubcategories.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Botón para restablecer todos los filtros */}
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="admin-reset-filters-btn"
+              onClick={handleResetFilters}
+              title="Restablecer todos los filtros"
+            >
+              [LIMPIAR_FILTROS &times;]
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Alerta de acción completada */}
       {alertMessage && (
         <div className="alert-box alert-success">
           <span>&gt; {alertMessage}</span>
@@ -94,6 +273,7 @@ export const AdminProducts: React.FC = () => {
         </div>
       )}
 
+      {/* Tabla de Productos */}
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
@@ -108,7 +288,7 @@ export const AdminProducts: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {isLoadingProducts ? (
+            {isLoading ? (
               <tr>
                 <td colSpan={7} style={{ textAlign: 'center', padding: '2rem' }}>
                   &gt; CARGANDO_DATOS...
@@ -116,8 +296,23 @@ export const AdminProducts: React.FC = () => {
               </tr>
             ) : !pageData || pageData.content.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                  &gt; NO_HAY_PRODUCTOS_REGISTRADOS
+                <td colSpan={7} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                  {hasActiveFilters ? (
+                    <div>
+                      <p style={{ marginBottom: '0.8rem', color: 'var(--accent-alert)' }}>
+                        &gt; NO_SE_ENCONTRARON_PRODUCTOS_CON_LOS_FILTROS_APLICADOS
+                      </p>
+                      <button
+                        type="button"
+                        className="admin-reset-filters-btn"
+                        onClick={handleResetFilters}
+                      >
+                        [RESTAURAR_CATÁLOGO_COMPLETO]
+                      </button>
+                    </div>
+                  ) : (
+                    <p>&gt; NO_HAY_PRODUCTOS_REGISTRADOS</p>
+                  )}
                 </td>
               </tr>
             ) : (
@@ -127,7 +322,10 @@ export const AdminProducts: React.FC = () => {
                     {prod.imgUrl ? (
                       <img src={prod.imgUrl} alt={prod.nombre} className="table-thumb" />
                     ) : (
-                      <div className="table-thumb" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div
+                        className="table-thumb"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
                         [N/A]
                       </div>
                     )}
@@ -184,6 +382,20 @@ export const AdminProducts: React.FC = () => {
         </table>
       </div>
 
+      {/* Controles de Paginación */}
+      {pageData && pageData.totalElements > 0 && (
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={pageData.totalPages}
+          totalElements={pageData.totalElements}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 14, 25, 50]}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          isLoading={isLoading}
+        />
+      )}
+
       {/* Modal de Alta y Edición de Producto */}
       <ProductFormModal
         isOpen={isModalOpen}
@@ -195,6 +407,7 @@ export const AdminProducts: React.FC = () => {
               ? 'Producto actualizado correctamente.'
               : 'Nuevo producto agregado al catálogo con éxito.'
           );
+          fetchAdminProducts();
         }}
       />
 

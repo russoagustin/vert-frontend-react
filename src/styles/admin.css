@@ -272,3 +272,202 @@
   border-bottom: 1px dashed var(--secondary-blue);
   padding-bottom: 1rem;
 }
+
+/* ============================================================
+   ADMIN TOOLBAR, SEARCH & FILTERS
+   ============================================================ */
+.admin-toolbar {
+  background: rgba(2, 62, 138, 0.08);
+  border: 1px solid var(--secondary-blue);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-search-icon {
+  position: absolute;
+  left: 0.8rem;
+  color: var(--primary-blue);
+  font-family: var(--font-main);
+  font-weight: bold;
+  pointer-events: none;
+  user-select: none;
+}
+
+.admin-search-input {
+  width: 100%;
+  background: rgba(5, 10, 14, 0.9);
+  border: 1px solid var(--secondary-blue);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  padding: 0.55rem 2rem 0.55rem 2rem;
+  border-radius: 4px;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.admin-search-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+.admin-clear-btn {
+  position: absolute;
+  right: 0.6rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.2rem;
+  transition: var(--transition-smooth);
+}
+
+.admin-clear-btn:hover {
+  color: var(--accent-alert);
+}
+
+.admin-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-filter-label {
+  font-size: 0.85rem;
+  color: var(--primary-blue);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.admin-filter-select {
+  background: rgba(5, 10, 14, 0.9);
+  border: 1px solid var(--secondary-blue);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  min-width: 160px;
+}
+
+.admin-filter-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+.admin-reset-filters-btn {
+  background: rgba(255, 51, 102, 0.1);
+  border: 1px solid var(--accent-alert);
+  color: var(--accent-alert);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.admin-reset-filters-btn:hover {
+  background: rgba(255, 51, 102, 0.25);
+  box-shadow: 0 0 8px var(--accent-alert);
+}
+
+/* ============================================================
+   ADMIN PAGINATION CONTROLS
+   ============================================================ */
+.admin-pagination-wrapper {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(2, 62, 138, 0.08);
+  border: 1px solid var(--secondary-blue);
+  border-radius: 6px;
+}
+
+.admin-pagination-info {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.admin-pagination-info strong {
+  color: var(--primary-blue);
+}
+
+.admin-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.admin-page-btn {
+  background: rgba(2, 62, 138, 0.15);
+  border: 1px solid var(--secondary-blue);
+  color: var(--primary-blue);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border-radius: 3px;
+  min-width: 34px;
+  text-align: center;
+}
+
+.admin-page-btn:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+.admin-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--secondary-blue);
+  color: var(--text-muted);
+}
+
+.admin-page-btn.active {
+  background: rgba(0, 229, 255, 0.25);
+  border-color: var(--primary-blue);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+
+.admin-page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+

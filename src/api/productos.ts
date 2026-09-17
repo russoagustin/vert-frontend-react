@@ -43,6 +43,9 @@ export async function getProductos(params: ProductFilterParams = {}): Promise<Pa
   if (params.size !== undefined) query.append('size', params.size.toString());
   const sortParam = params.sort ?? 'id,desc';
   if (sortParam) query.append('sort', sortParam);
+  if (params.search && params.search.trim() !== '') {
+    query.append('nombre', params.search.trim());
+  }
 
   const endpoint = `/api/productos${query.toString() ? `?${query.toString()}` : ''}`;
 
