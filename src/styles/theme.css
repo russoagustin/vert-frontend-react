@@ -46,7 +46,7 @@ body::before {
   background: 
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
     linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
-  z-index: 999;
+  z-index: 10;
   background-size: 100% 3px, 4px 100%;
   pointer-events: none;
 }
@@ -104,7 +104,7 @@ body::before {
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  z-index: 1;
+  z-index: auto;
 }
 
 main.main-content {
